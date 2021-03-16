@@ -3,12 +3,15 @@ import os
 import random
 from pynput import keyboard
 
+from .services.message_service import MessageService
+
 
 BASE_PATH = os.path.join('./media', 'sounds')
 AUDIO_LIST = ['audio1.wav', 'audio2.wav', 'audio3.wav', 
                 'audio4.wav', 'audio5.wav']
 CORRECT_AUDIO = 'correct.wav'
 WRONG_AUDIO = 'wrong.wav'
+WINNER_AUDIO = "winner.wav"
 
 
 def shuffle_game(audio_list: list):
@@ -25,41 +28,49 @@ def play_sound(audio : str):
     play_obj.wait_done()
 
 def check_correctness(audio : str, position : int):
+    
     if round_dict[1] == None:
         round_dict[1] = (audio, position)
-    elif round_dict[1][0] == audio:
+        position_to_screen = (position, None)
+        message = f"Reproduzindo audio na posição {position}: {audio}"
+        MessageService.show_screen(completed, positions_played = position_to_screen, message=message)
+        play_sound(audio)
+        
+        
+    elif round_dict[1][0] == audio and round_dict[1][1]!=position:
         completed[round_dict[1][1]] = 1
         completed[position] = 1
-        play_sound('correct.wav')
+        position_to_screen = (round_dict[1][1], position)
+        message = f"Reproduzindo audio na posição {position}: {audio}"
+        MessageService.show_screen(completed, positions_played = position_to_screen, message=message)
+        play_sound(audio)
+        play_sound(CORRECT_AUDIO)
         round_dict[1] = None
+        round_dict[2] = None
+        position_to_screen = (None, None)
+        
     else:
+        position_to_screen = (round_dict[1][1], position)
+        message = f"Reproduzindo audio na posição {position}: {audio}"
+        MessageService.show_screen(completed, positions_played = position_to_screen, message=message)
+        play_sound(audio)
+        play_sound(WRONG_AUDIO)
         round_dict[1] = None
-        play_sound('wrong.wav')
-    message(completed)
+        round_dict[2] = None
+        position_to_screen = (None, None)
 
-def message(situation: str, message: str = ""):
-    os.system('cls' if os.name=='nt' else 'clear')
-    print("##################################################")
-    print("#                   Jogo                         #")
-    print("##################################################")
-    print("#                  Situação                      #")
-    print(f"               {situation}                          ")
-    print(f"               {message}                        ")
-    
+        
+    MessageService.show_screen(completed, positions_played = position_to_screen)
 
 def on_press(key):
-   
-    message(completed)
+
+    MessageService.show_screen(completed)
 
     if key == keyboard.Key.esc:
             return False
 
     if key.vk == 65437:
         audio_to_play = new_audio_list[5]
-
-        message(completed, f"Executando audio: {audio_to_play}")
-
-        play_sound(audio_to_play)
         check_correctness(audio_to_play, 5)
         
         return True
@@ -68,10 +79,12 @@ def on_press(key):
 
         if key == keyboard.KeyCode.from_char(str(i)):
             audio_to_play = new_audio_list[i]
-            message(completed, f"Executando audio: {audio_to_play}")
-            play_sound(audio_to_play)
             check_correctness(audio_to_play, i)
-            
+
+    if sum(completed) == len(completed):
+        MessageService.show_screen(completed, message="Parabéns, voce concluiu o jogo")
+        play_sound(WINNER_AUDIO)
+        return False        
 
 def main():
 
@@ -83,6 +96,6 @@ if __name__ == "__main__":
     completed = [0] * 10
     round_dict = {1: None, 2: None}
     
-    message(completed)
+    MessageService.show_screen(completed)
 
     main()
