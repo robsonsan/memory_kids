@@ -6,7 +6,6 @@ import os
 class MessageService:
     def __init__(self):
         pass
-
     
     @staticmethod
     def show_screen(situation : list, header : str = "Jogo" , message: str="", positions_played=(None, None)):

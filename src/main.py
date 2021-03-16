@@ -4,6 +4,7 @@ import random
 from pynput import keyboard
 
 from .services.message_service import MessageService
+from .services.sound_services import SoundService 
 
 
 BASE_PATH = os.path.join('./media', 'sounds')
@@ -21,12 +22,6 @@ def shuffle_game(audio_list: list):
     
     return new_audio_list
 
-def play_sound(audio : str):
-    path = os.path.join('./media', 'sounds', audio)
-    wave_obj = sa.WaveObject.from_wave_file(path)
-    play_obj = wave_obj.play()
-    play_obj.wait_done()
-
 def check_correctness(audio : str, position : int):
     
     if round_dict[1] == None:
@@ -34,7 +29,7 @@ def check_correctness(audio : str, position : int):
         position_to_screen = (position, None)
         message = f"Reproduzindo audio na posição {position}: {audio}"
         MessageService.show_screen(completed, positions_played = position_to_screen, message=message)
-        play_sound(audio)
+        SoundService.play_sound(audio)
         
         
     elif round_dict[1][0] == audio and round_dict[1][1]!=position:
@@ -43,8 +38,8 @@ def check_correctness(audio : str, position : int):
         position_to_screen = (round_dict[1][1], position)
         message = f"Reproduzindo audio na posição {position}: {audio}"
         MessageService.show_screen(completed, positions_played = position_to_screen, message=message)
-        play_sound(audio)
-        play_sound(CORRECT_AUDIO)
+        SoundService.play_sound(audio)
+        SoundService.play_sound(CORRECT_AUDIO)
         round_dict[1] = None
         round_dict[2] = None
         position_to_screen = (None, None)
@@ -53,8 +48,8 @@ def check_correctness(audio : str, position : int):
         position_to_screen = (round_dict[1][1], position)
         message = f"Reproduzindo audio na posição {position}: {audio}"
         MessageService.show_screen(completed, positions_played = position_to_screen, message=message)
-        play_sound(audio)
-        play_sound(WRONG_AUDIO)
+        SoundService.play_sound(audio)
+        SoundService.play_sound(WRONG_AUDIO)
         round_dict[1] = None
         round_dict[2] = None
         position_to_screen = (None, None)
@@ -69,21 +64,20 @@ def on_press(key):
     if key == keyboard.Key.esc:
             return False
 
-    if key.vk == 65437:
-        audio_to_play = new_audio_list[5]
-        check_correctness(audio_to_play, 5)
-        
-        return True
-    
     for i in range(10):
 
         if key == keyboard.KeyCode.from_char(str(i)):
             audio_to_play = new_audio_list[i]
             check_correctness(audio_to_play, i)
 
+    if key.vk == 65437:
+        audio_to_play = new_audio_list[5]
+        check_correctness(audio_to_play, 5)
+
+
     if sum(completed) == len(completed):
         MessageService.show_screen(completed, message="Parabéns, voce concluiu o jogo")
-        play_sound(WINNER_AUDIO)
+        SoundService.play_sound(WINNER_AUDIO)
         return False        
 
 def main():
