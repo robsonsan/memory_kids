@@ -1,4 +1,3 @@
-import simpleaudio as sa
 import os
 import random
 from pynput import keyboard
