@@ -2,8 +2,8 @@ import os
 import random
 from pynput import keyboard
 
-from .services.message_service import MessageService
-from .services.sound_services import SoundService 
+from services.message_service import MessageService
+from services.sound_services import SoundService 
 
 
 BASE_PATH = os.path.join('./media', 'sounds')

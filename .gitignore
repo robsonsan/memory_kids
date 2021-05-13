@@ -1,3 +1,4 @@
 .vscode/
 src/*pycache*/
 src/services/*pycache*/
+venv_memory_kids

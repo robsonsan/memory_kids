@@ -1,0 +1,9 @@
+colorama==0.4.4
+commonmark==0.9.1
+evdev==1.4.0
+Pygments==2.9.0
+pynput==1.7.3
+python-xlib==0.29
+rich==10.2.0
+simpleaudio==1.0.4
+six==1.16.0
